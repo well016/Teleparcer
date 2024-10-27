@@ -31,7 +31,7 @@
   <!-- Стилизация текста -->
   <style>
     .neon-text {
-      font-family: 'Arial', sans-serif;
+      font-family: 'IMPACT', sans-serif;
       font-size: 48px;
       fill: #ffffff;
       text-anchor: middle;
