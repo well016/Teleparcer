@@ -1,17 +1,17 @@
-<svg width="800" height="100" xmlns="http://www.w3.org/2000/svg">
+<svg width="900" height="100" xmlns="http://www.w3.org/2000/svg">
   <style>
     .text {
       font-family: 'Arial', sans-serif;
       font-size: 48px;
-      fill: #000;
+      fill: #1E90FF; /* Ярко-синий цвет */
       opacity: 0;
       transform-origin: center;
-      animation: popUp 1.5s forwards;
+      animation: popUp 3s infinite;
     }
     @keyframes popUp {
       0% {
         opacity: 0;
-        transform: scale(0.5);
+        transform: scale(0.3);
       }
       60% {
         opacity: 1;
