@@ -1,0 +1,29 @@
+<svg width="800" height="100" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .text {
+      font-family: 'Arial', sans-serif;
+      font-size: 48px;
+      fill: #000;
+      opacity: 0;
+      transform-origin: center;
+      animation: popUp 1.5s forwards;
+    }
+    @keyframes popUp {
+      0% {
+        opacity: 0;
+        transform: scale(0.5);
+      }
+      60% {
+        opacity: 1;
+        transform: scale(1.2);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+  </style>
+  <text x="50%" y="50%" text-anchor="middle" alignment-baseline="middle" class="text">
+    Расписание KFU – Telegram Бот
+  </text>
+</svg>
