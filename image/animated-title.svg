@@ -1,29 +1,44 @@
-<svg width="900" height="100" xmlns="http://www.w3.org/2000/svg">
+<svg width="800" height="150" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Определяем фильтр для неонового свечения -->
+    <filter id="neon-glow">
+      <!-- Утолщаем текст для более яркого свечения -->
+      <feMorphology in="SourceAlpha" operator="dilate" radius="1" result="thicken"/>
+      <!-- Применяем размытие и анимацию его степени для пульсации -->
+      <feGaussianBlur in="thicken" stdDeviation="5" result="blurred">
+        <animate attributeName="stdDeviation" values="5;15;5" dur="1.5s" repeatCount="indefinite"/>
+      </feGaussianBlur>
+      <!-- Применяем цветовое преобразование и анимируем цвета для смены оттенков свечения -->
+      <feColorMatrix type="matrix" in="blurred" result="colouredBlur" values="
+        0 0 0 0 0.07
+        0 0 0 0 0.56
+        0 0 0 0 1
+        0 0 0 1 0">
+        <animate attributeName="values"
+          values="
+            0 0 0 0 0.07  0 0 0 0 0.56  0 0 0 0 1  0 0 0 1 0;
+            0 0 0 0 0    0 0 0 0 1     0 0 0 0 1  0 0 0 1 0;
+            0 0 0 0 0.07 0 0 0 0 0.56  0 0 0 0 1  0 0 0 1 0"
+          dur="1.5s" repeatCount="indefinite"/>
+      </feColorMatrix>
+      <!-- Объединяем эффекты свечения и исходного текста -->
+      <feMerge>
+        <feMergeNode in="colouredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <!-- Стилизация текста -->
   <style>
-    .text {
+    .neon-text {
       font-family: 'Arial', sans-serif;
       font-size: 48px;
-      fill: #1E90FF; /* Ярко-синий цвет */
-      opacity: 0;
-      transform-origin: center;
-      animation: popUp 3s infinite;
-    }
-    @keyframes popUp {
-      0% {
-        opacity: 0;
-        transform: scale(0.3);
-      }
-      60% {
-        opacity: 1;
-        transform: scale(1.2);
-      }
-      100% {
-        opacity: 1;
-        transform: scale(1);
-      }
+      fill: #ffffff;
+      text-anchor: middle;
     }
   </style>
-  <text x="50%" y="50%" text-anchor="middle" alignment-baseline="middle" class="text">
+  <!-- Текст с применением фильтра неонового свечения -->
+  <text x="50%" y="50%" dy=".35em" class="neon-text" filter="url(#neon-glow)">
     Расписание KFU – Telegram Бот
   </text>
 </svg>
