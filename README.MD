@@ -1,7 +1,49 @@
-<p align="center">
-  <img src="image/animated-title.svg" alt="Расписание KFU – Telegram Бот">
-</p>
+<!-- Neon Glow -->
+<h1 class="neon-text">Расписание KFU – Telegram Бот</h1>
 
+<style>
+  .neon-text {
+    font-size: 48px;
+    color: #fff;
+    text-align: center;
+    font-family: 'Arial', sans-serif;
+    text-shadow:
+      0 0 5px #1E90FF,
+      0 0 10px #1E90FF,
+      0 0 20px #1E90FF,
+      0 0 40px #1E90FF,
+      0 0 80px #1E90FF,
+      0 0 90px #1E90FF,
+      0 0 100px #1E90FF,
+      0 0 150px #1E90FF;
+    animation: neon 1.5s ease-in-out infinite alternate;
+  }
+
+  @keyframes neon {
+    from {
+      text-shadow:
+        0 0 5px #1E90FF,
+        0 0 10px #1E90FF,
+        0 0 20px #1E90FF,
+        0 0 40px #1E90FF,
+        0 0 80px #1E90FF,
+        0 0 90px #1E90FF,
+        0 0 100px #1E90FF,
+        0 0 150px #1E90FF;
+    }
+    to {
+      text-shadow:
+        0 0 10px #00FFFF,
+        0 0 20px #00FFFF,
+        0 0 30px #00FFFF,
+        0 0 40px #00FFFF,
+        0 0 50px #00FFFF,
+        0 0 60px #00FFFF,
+        0 0 70px #00FFFF,
+        0 0 80px #00FFFF;
+    }
+  }
+</style>
 ![kfu_logo_l_rus_1_.png](image%2Fkfu_logo_l_rus_1_.png)
 ## Описание проекта
 
