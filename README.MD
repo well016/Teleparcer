@@ -1,4 +1,7 @@
-# Telegram Бот для получения Расписании занятий КФУ
+<p align="center">
+  <img src="image/animated-title.svg" alt="Расписание KFU – Telegram Бот">
+</p>
+
 ![kfu_logo_l_rus_1_.png](image%2Fkfu_logo_l_rus_1_.png)
 ## Описание проекта
 
