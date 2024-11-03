@@ -1,65 +1,106 @@
-import logging
-import requests
-from bs4 import BeautifulSoup
 from aiogram import Bot, Dispatcher, types
+from aiogram.fsm.storage.memory import MemoryStorage
+from aiogram.fsm.context import FSMContext
+from aiogram.fsm.state import State, StatesGroup
+from aiogram import F
+from aiogram import Router
+from aiogram.types import Message
 from aiogram.filters import Command
+from parcer import Parser
+import asyncio
+import sqlite3
+import tokken
+# Подключение к базе данных SQLite
+conn = sqlite3.connect('users.db')
+cursor = conn.cursor()
 
-API_TOKEN = '7723642778:AAFyox7V__q5S6iYmbD8faOZmjjG85ru8kU'
+# Создание таблицы пользователей, если она не существует
+cursor.execute('''
+    CREATE TABLE IF NOT EXISTS users (
+        user_id INTEGER PRIMARY KEY,
+        login TEXT NOT NULL,
+        password TEXT NOT NULL
+    )
+''')
+conn.commit()
 
-# Включение логирования
-logging.basicConfig(level=logging.INFO)
+# Инициализация бота и диспетчера
+bot = Bot(token=tokken.TOKEN)
+storage = MemoryStorage()
+dp = Dispatcher(storage=storage)
+router = Router()
+dp.include_router(router)
 
-# Создаем объект бота и диспетчер
-bot = Bot(token=API_TOKEN)
-dp = Dispatcher()
-
-# URL для авторизации и парсинга данных
-login_url = 'https://shelly.kpfu.ru/e-ksu/private_office.kfuscript'
-data_url = 'https://shelly.kpfu.ru/e-ksu/private_office_data'
-
-# Ваши учетные данные
-payload = {
-    'p_login': 'RailRSabirov',
-    'p_pass': 'QMT0Qk5mm7'
-}
-
-
-def parse_data():
-    with requests.Session() as session:
-        # Выполняем логин
-        response = session.post(login_url, data=payload, headers={'Content-Type': 'application/x-www-form-urlencoded'})
-        if response.status_code == 200:
-            # Используем сессию для доступа к данным
-            response = session.get(data_url)
-            soup = BeautifulSoup(response.content, 'html.parser')
-            # Парсим нужные данные (пример: находим элемент с необходимыми данными)
-            data_element = soup.find('div', class_='top_block')
-            return data_element.text if data_element else 'Не удалось найти данные.'
-        else:
-            return 'Ошибка логина'
-
+# Определение состояний
+class ScheduleStates(StatesGroup):
+    login = State()
+    password = State()
 
 # Обработчик команды /start
-@dp.message(Command(commands=['start']))
-async def send_welcome(message: types.Message):
-    await message.reply("Привет! Используйте /getdata, чтобы получить данные.")
+@router.message(Command('start'))
+async def start(message: Message, state: FSMContext):
+    user_id = message.from_user.id
+    cursor.execute('SELECT login, password FROM users WHERE user_id = ?', (user_id,))
+    user_data = cursor.fetchone()
 
+    if user_data:
+        await message.answer("Вы уже авторизованы. Можете сразу ввести день недели, чтобы получить расписание.")
+    else:
+        await message.answer("\U0001F916 Привет! Введите ваш логин для начала.")
+        await state.set_state(ScheduleStates.login)
 
-# Обработчик команды /getdata
-@dp.message(Command(commands=['getdata']))
-async def get_data(message: types.Message):
-    await message.reply("Пожалуйста, подождите, идет обработка запроса...")
-    data = parse_data()
-    await message.reply(f'Ваши данные: {data}')
+# Обработчик ввода логина
+@router.message(ScheduleStates.login)
+async def get_login(message: Message, state: FSMContext):
+    await state.update_data(login=message.text)
+    await message.answer("Введите ваш пароль.")
+    await state.set_state(ScheduleStates.password)
 
+# Обработчик ввода пароля
+@router.message(ScheduleStates.password)
+async def get_password(message: Message, state: FSMContext):
+    data = await state.get_data()
+    login = data['login']
+    password = message.text
 
-# Запуск бота
-if __name__ == '__main__':
-    import asyncio
+    # Сохранение логина и пароля в базе данных
+    user_id = message.from_user.id
+    cursor.execute('REPLACE INTO users (user_id, login, password) VALUES (?, ?, ?)', (user_id, login, password))
+    conn.commit()
 
+    await message.answer("Вы успешно авторизовались! Теперь можете ввести день недели, чтобы получить расписание.")
+    await state.clear()
+
+# Обработчик выбора дня недели (без состояния)
+@router.message()
+async def get_schedule(message: Message):
+    user_id = message.from_user.id
+    cursor.execute('SELECT login, password FROM users WHERE user_id = ?', (user_id,))
+    user_data = cursor.fetchone()
+
+    if not user_data:
+        await message.answer("Сначала вам нужно авторизоваться. Введите команду /start для начала.")
+        return
+
+    login, password = user_data
+    day_of_week = message.text
+
+    try:
+        parser = Parser(login, password)
+        schedule = parser.get_table_by_day(day_of_week)
+        await message.answer(schedule)
+    except Exception as e:
+        await message.answer(f"Ошибка: {str(e)}")
+
+# Обработчик команды /cancel
+@router.message(Command('cancel'))
+@router.message(F.text.lower() == 'отмена')
+async def cancel_handler(message: Message, state: FSMContext):
+    await state.clear()
+    await message.answer("Операция отменена.")
 
 async def main():
-    await dp.start_polling(bot)
+    await dp.start_polling(bot, skip_updates=True)
 
-
-asyncio.run(main())
+if __name__ == '__main__':
+    asyncio.run(main())

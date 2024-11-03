@@ -7,7 +7,7 @@ import datetime
 
 
 
-class parcer:
+class Parser:
     def __init__(self,login, password):
         self.login=login
         self.password=password
@@ -82,8 +82,13 @@ class parcer:
         return "\n".join(schedule)
 
 
+if __name__ == '__main__':
+    a=Parser('RailRSabirov','QMT0Qk5mm7')
+    print(a.get_table_by_day('Понедельник'))
+    print()
+    print(a.get_table_by_day('Вторник'))
+    print()
+    print(a.get_table_by_day('Среда'))
 
-a=parcer('RailRSabirov','QMT0Qk5mm7')
 
-print(a.get_table_by_day('Понедельник'))
 
